@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Submit Your Own Resume</title>
+        <script>
+            var currentSectionID = 0 // first one already created with id 0
+            var currentItemID = 0 // first one already created with id 0
+
+            function createSection(){
+                var body = document.getElementsByTagName("body")[0]
+                var sectionTable = document.createElement("table")
+                body.appendChild(sectionTable)
+
+                currentSectionID += 1
+                sectionTable.setAttribute("id", currentSectionID)
+                createItem(sectionTable)          
+
+            }
+
+            function createItem(sectionTable){
+                currentItemID += 1
+                var itemID = "item" + currentItemID
+
+                var itemAsARow = document.createElement("tr")
+                sectionTable.appendChild(itemAsARow)
+                
+                itemAsARow.setAttribute("id", itemID)
+
+                var sectionTitleTR = document.createElement("tr")
+                insertData(sectionTitleTR, "section-title")
+                itemAsARow.appendChild(sectionTitleTR)
+
+                var itemNameTR = document.createElement("tr")
+                insertData(itemNameTR, "item-name")
+                itemAsARow.appendChild(itemNameTR)
+
+                var dateStartTR = document.createElement("tr")
+                insertData(dateStartTR, "date-start")
+                itemAsARow.appendChild(dateStartTR)
+
+                var dateEndTR = document.createElement("tr")
+                insertData(dateEndTR, "date-end")
+                itemAsARow.appendChild(dateEndTR)
+
+            }
+
+            
+            function insertData(tr, type){
+                var labelTextObject = {"section-title": "Section Title: ", "item-name": "Item Name: ", 
+                "date-start": "Date started: ", "date-end": "Date ended: "}
+                var id = type + currentItemID
+
+                var tdLable = document.createElement("td")
+                var label = document.createElement("label")
+                tdLable.appendChild(label)
+
+                var labelText = document.createTextNode(labelTextObject[type])
+                label.setAttribute("for", id)
+                label.appendChild(labelText)
+
+                var tdInput = document.createElement("td")
+                var input = document.createElement("input")
+                tdInput.appendChild(input)
+
+                input.setAttribute("id", id)
+                if (type == "date-start" || type == "date-end") input.setAttribute("type", "date")
+                else input.setAttribute("type", "text")
+
+                tr.appendChild(tdLable)
+                tr.appendChild(tdInput)
+            }
+        </script>
+    </head>
+    <body>
+        <form>
+            <h1>Resume: </h1>
+            <table>
+                <tr>
+                    <td><label for ="name">Name: </label></td>
+                    <td><input type = "text" id = "name"></td>
+                </tr>
+                <tr>
+                    <td><label for ="address">Address: </label></td>
+                    <td><input type = "text" id = "address"></td>
+                </tr>
+                <tr>
+                    <td><label for ="email">Email: </label></td>
+                    <td><input type = "email" id = "email"></td>
+                </tr>
+                <tr>
+                    <td><label for ="phone">Phone number: </label></td>
+                    <td><input type = "text" id = "phone"></td>
+                </tr>
+            </table>
+            <br>
+            <input type = "button" onclick = "createSection()" value = "Add More Section">
+            <table id = "0">
+                <tr>
+                    <td><label for ="section-title0">Section Title: </label></td>
+                    <td><input type = "text" id = "section-title0" placeholder = "Ex: Work Experience"></td>
+                </tr>
+                <tr>
+                    <td><label for ="item-name0">Item: </label></td>
+                    <td><input type = "text" id = "item-name0" placeholder = "Ex: Mcdonald's"></td>
+                </tr>
+                <tr>
+                    <td><label for ="date-start0">Date Started: </label></td>
+                    <td><input type = "date" id = "date-start0" placeholder = "Date you started"></td>
+                </tr>
+                <tr>
+                    <td><label for ="date-end0">Date ended: </label></td>
+                    <td><input type = "date" id = "date-end0" placeholder = "Date you ended"></td>
+                </tr>
+            </table>
+        </form>
+    </body>
+</html>
