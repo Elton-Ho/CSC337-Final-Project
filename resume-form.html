@@ -2,54 +2,61 @@
 <html>
     <head>
         <title>Submit Your Own Resume</title>
+        <style>
+            table{
+                margin-left: 10px;
+            }
+        </style>
         <script>
             var currentSectionID = 0 // first one already created with id 0
             var currentItemID = 0 // first one already created with id 0
 
             function createSection(){
-                var body = document.getElementsByTagName("body")[0]
+                var resume = document.getElementById("resume")
                 var sectionTable = document.createElement("table")
-                body.appendChild(sectionTable)
+                resume.appendChild(sectionTable)
 
                 currentSectionID += 1
                 sectionTable.setAttribute("id", currentSectionID)
-                createItem(sectionTable)          
 
+                createItemButton(sectionTable)
+
+                // create section title
+                var sectionTitleTR = document.createElement("tr")
+                insertData(sectionTitleTR, "section-title", currentSectionID)
+                sectionTable.appendChild(sectionTitleTR)
+
+                // make the first element
+                createItem(currentSectionID)       
             }
 
-            function createItem(sectionTable){
+            function createItem(sectionTableID){
+                console.log("hi")
+                var sectionTable = document.getElementById(sectionTableID)
+
                 currentItemID += 1
-                var itemID = "item" + currentItemID
-
-                var itemAsARow = document.createElement("tr")
-                sectionTable.appendChild(itemAsARow)
-                
-                itemAsARow.setAttribute("id", itemID)
-
-                var sectionTitleTR = document.createElement("tr")
-                insertData(sectionTitleTR, "section-title")
-                itemAsARow.appendChild(sectionTitleTR)
 
                 var itemNameTR = document.createElement("tr")
-                insertData(itemNameTR, "item-name")
-                itemAsARow.appendChild(itemNameTR)
+                insertData(itemNameTR, "item-name", currentItemID)
+                sectionTable.appendChild(itemNameTR)
 
                 var dateStartTR = document.createElement("tr")
-                insertData(dateStartTR, "date-start")
-                itemAsARow.appendChild(dateStartTR)
+                insertData(dateStartTR, "date-start", currentItemID)
+                sectionTable.appendChild(dateStartTR)
 
                 var dateEndTR = document.createElement("tr")
-                insertData(dateEndTR, "date-end")
-                itemAsARow.appendChild(dateEndTR)
-
+                insertData(dateEndTR, "date-end", currentItemID)
+                sectionTable.appendChild(dateEndTR)
             }
 
             
-            function insertData(tr, type){
+            function insertData(tr, type, currentGeneralID){
                 var labelTextObject = {"section-title": "Section Title: ", "item-name": "Item Name: ", 
                 "date-start": "Date started: ", "date-end": "Date ended: "}
-                var id = type + currentItemID
+                
+                var id = type + currentGeneralID
 
+                console.log(id)
                 var tdLable = document.createElement("td")
                 var label = document.createElement("label")
                 tdLable.appendChild(label)
@@ -69,11 +76,25 @@
                 tr.appendChild(tdLable)
                 tr.appendChild(tdInput)
             }
+
+            function createItemButton(sectionTable){
+                var createItemButton = document.createElement("input")
+
+                var createButtonTR = document.createElement("tr")
+                var createButtonTD = document.createElement("td")
+                createButtonTD.appendChild(createItemButton)
+                createButtonTR.appendChild(createButtonTD)
+                sectionTable.appendChild(createButtonTR)
+
+                createItemButton.setAttribute("type", "button")
+                createItemButton.setAttribute("onclick", "createItem('" + sectionTable.id + "')")
+                createItemButton.setAttribute("value", "Create More Item")
+            }
         </script>
     </head>
     <body>
-        <form>
-            <h1>Resume: </h1>
+        <h1>Resume: </h1>
+        <form id = "resume">
             <table>
                 <tr>
                     <td><label for ="name">Name: </label></td>
@@ -95,6 +116,9 @@
             <br>
             <input type = "button" onclick = "createSection()" value = "Add More Section">
             <table id = "0">
+                <tr>
+                    <td><input type = "button" onclick = "createItem(0)" value = "Create More Item"></td>
+                </tr>
                 <tr>
                     <td><label for ="section-title0">Section Title: </label></td>
                     <td><input type = "text" id = "section-title0" placeholder = "Ex: Work Experience"></td>
