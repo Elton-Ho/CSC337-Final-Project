@@ -27,7 +27,16 @@
                 sectionTableID = "section"+currentSectionID
                 sectionTable.setAttribute("id", sectionTableID)
 
-                createItemButton(sectionTable)
+                var createButtonTR = createItemButton(sectionTable)
+
+                var removeSectionButton = document.createElement("input")
+                var removeSectionTD = document.createElement("td")
+                removeSectionTD.appendChild(removeSectionButton)
+                createButtonTR.appendChild(removeSectionTD)
+
+                removeSectionButton.setAttribute("type", "button")
+                removeSectionButton.setAttribute("onclick", "document.getElementById('"+sectionTableID +"').remove()")
+                removeSectionButton.setAttribute("value", "Remove this section")
 
                 // create section title
                 var sectionTitleTR = document.createElement("tr")
@@ -109,6 +118,8 @@
                 createItemButton.setAttribute("type", "button")
                 createItemButton.setAttribute("onclick", "createItem('" + sectionTable.id + "')")
                 createItemButton.setAttribute("value", "Create More Item")
+
+                return createButtonTR
             }
 
             function removeItemButton(sectionTable, currentItemID){
@@ -138,6 +149,7 @@
         <h1>Resume: </h1>
         <form id = "resume" method ="GET" action = "print">
             <table>
+                <input type="submit" value = "Send Resume">
                 <tr>
                     <td><lable for ="name">Name: </lable></td>
                     <td><input type = "text" id = "name" name = "name"></td>
@@ -157,7 +169,6 @@
             </table>
             <br>
             <input type = "button" onclick = "createSection()" value = "Add More Section">
-            <input type="submit" value = "Send Resume">
             <br>
             <table id = "section0">
                 <tr>
