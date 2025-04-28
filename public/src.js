@@ -1,10 +1,11 @@
 function addHeader()
 {
     const doc = document.getElementsByTagName("html")[0]
+    const body = document.getElementsByTagName("body")[0]
     fetch("header").then(function (res){return res.text()}).then(
         function (res){
         const head =document.createElement("header");
         head.innerHTML = res;
-        doc.appendChild(head);
+        doc.insertBefore(head, body);
     }).catch(err => console.log(err))
 }
