@@ -68,6 +68,11 @@
                 insertData(dateEndTR, "date-end", currentItemID)
                 sectionTable.appendChild(dateEndTR)
 
+                var roleTR = document.createElement("tr")
+                roleTR.setAttribute("class", "item"+currentItemID)
+                insertData(roleTR, "role", currentItemID)
+                sectionTable.appendChild(roleTR)
+
                 var descriptionTR = document.createElement("tr")
                 descriptionTR.setAttribute("class", "item"+currentItemID)
                 insertData(descriptionTR, "description", currentItemID)
@@ -78,8 +83,9 @@
 
             
             function insertData(tr, type, currentGeneralID){
-                var lableTextObject = {"section-title": "Section Title: ", "item-name": "Item Name: ", 
-                "date-start": "Date started: ", "date-end": "Date ended: ", "description": "Description: "}
+                var lableTextObject = {"section-title": "Section Title: ", 
+                "item-name": "Item Name: ", "role": "Role", "date-start": "Date started: ",
+                "date-end": "Date ended: ", "description": "Description: "}
                 
                 var id = type + currentGeneralID
 
@@ -94,16 +100,40 @@
                 lable.appendChild(lableText)
 
                 var tdInput = document.createElement("td")
-                var input = document.createElement("input")
+                
+                var input
+                if (type == "description"){
+                    input = document.createElement("textarea")
+                    input.setAttribute("style", "width: 250px; height: 50px;")
+                }
+                else input = document.createElement("input")
                 tdInput.appendChild(input)
+
+                if (type == "section-title" || type == "item-name") input.setAttribute("required", true)
 
                 input.setAttribute("id", id)
                 input.setAttribute("name", id)
-                if (type == "date-start" || type == "date-end") input.setAttribute("type", "date")
+                if (type == "date-start" || type == "date-end"){
+                    input.setAttribute("type", "date")
+                    input.setAttribute("oninput", "setOtherAsRequired('"+ currentGeneralID + "')")
+                }
                 else input.setAttribute("type", "text")
 
                 tr.appendChild(tdLable)
                 tr.appendChild(tdInput)
+            }
+            function setOtherAsRequired(currentGeneralID){
+                // if one date is being filled out the other needs to be too
+                var dateStartInput = document.getElementById("date-start"+currentGeneralID)
+                var dateEndInput = document.getElementById("date-end"+currentGeneralID)
+                if (dateStartInput.value || dateEndInput.value){
+                    dateStartInput.required = true
+                    dateEndInput.required = true
+                }
+                else{
+                    dateStartInput.required = false
+                    dateEndInput.required = false
+                }
             }
 
             function createItemButton(sectionTable){
@@ -147,7 +177,7 @@
     </head>
     <body>
         <h1>Resume: </h1>
-        <form id = "resume" method ="GET" action = "print">
+        <form id = "resume" method ="POST" action = "print">
             <table>
                 <input type="submit" value = "Send Resume">
                 <tr>
@@ -176,23 +206,27 @@
                 </tr>
                 <tr>
                     <td><lable for ="section-title0">Section Title: </lable></td>
-                    <td><input type = "text" id = "section-title0" name = "section-title0" placeholder = "Ex: Work Experience"></td>
+                    <td><input type = "text" id = "section-title0" name = "section-title0" placeholder = "Ex: Work Experience" required></td>
                 </tr>
                 <tr class="item0">
                     <td><lable for ="item-name0">Item: </lable></td>
-                    <td><input type = "text" id = "item-name0" name = "item-name0" placeholder = "Ex: Mcdonald's"></td>
+                    <td><input type = "text" id = "item-name0" name = "item-name0" placeholder = "Ex: Mcdonald's" required></td>
                 </tr>
                 <tr class="item0">
                     <td><lable for ="date-start0">Date Started: </lable></td>
-                    <td><input type = "date" id = "date-start0" name = "date-start0" placeholder = "Date you started"></td>
+                    <td><input type = "date" id = "date-start0" name = "date-start0" placeholder = "Date you started" oninput="setOtherAsRequired('0')"></td>
                 </tr>
                 <tr class="item0">
                     <td><lable for ="date-end0">Date ended: </lable></td>
-                    <td><input type = "date" id = "date-end0" name = "date-end0" placeholder = "Date you ended"></td>
+                    <td><input type = "date" id = "date-end0" name = "date-end0" placeholder = "Date you ended" oninput="setOtherAsRequired('0')"></td>
+                </tr>
+                <tr class="item0">
+                    <td><lable for ="role0">Role: </lable></td>
+                    <td><input type = "text" id = "role0" name = "role0" placeholder = "Ex: Casher"></td>
                 </tr>
                 <tr class="item0">
                     <td><lable for ="description0">Description: </lable></td>
-                    <td><input type = "text" id = "description0" name = "description0" placeholder = "Ex: This job entailed me to ..."></td>
+                    <td><textarea id = "description0" name = "description0" style="width: 250px; height: 50px;" placeholder = "Each new line gets its own bullet point (anytime you press enter) Ex: This job entailed me to..."></textarea></td>
                 </tr>
                 <tr class="item0">
                     <td><input type = "button" id = "remove0" onclick = "removeItem('item0')" value = "Remove this Item"></td>
