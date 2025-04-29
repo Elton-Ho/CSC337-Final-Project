@@ -24,8 +24,8 @@
 
                 currentSectionID += 1
 
-                sectionTableID = "section"+currentSectionID
-                sectionTable.setAttribute("id", sectionTableID)
+                var sectionTableID = "section"+currentSectionID
+                sectionTable.id = sectionTableID
 
                 var createButtonTR = createItemButton(sectionTable)
 
@@ -34,9 +34,9 @@
                 removeSectionTD.appendChild(removeSectionButton)
                 createButtonTR.appendChild(removeSectionTD)
 
-                removeSectionButton.setAttribute("type", "button")
-                removeSectionButton.setAttribute("onclick", "document.getElementById('"+sectionTableID +"').remove()")
-                removeSectionButton.setAttribute("value", "Remove this section")
+                removeSectionButton.type = "button"
+                removeSectionButton.addEventListener("click", function(){document.getElementById(sectionTableID).remove()})
+                removeSectionButton.value = "Remove this section"
 
                 // create section title
                 var sectionTitleTR = document.createElement("tr")
@@ -54,27 +54,27 @@
                 currentItemID += 1
 
                 var itemNameTR = document.createElement("tr")
-                itemNameTR.setAttribute("class", "item"+currentItemID)
+                itemNameTR.className =  "item"+currentItemID
                 insertData(itemNameTR, "item-name", currentItemID)
                 sectionTable.appendChild(itemNameTR)
 
                 var dateStartTR = document.createElement("tr")
-                dateStartTR.setAttribute("class", "item"+currentItemID)
+                dateStartTR.className = "item"+currentItemID
                 insertData(dateStartTR, "date-start", currentItemID)
                 sectionTable.appendChild(dateStartTR)
 
                 var dateEndTR = document.createElement("tr")
-                dateEndTR.setAttribute("class", "item"+currentItemID)
+                dateEndTR.className = "item"+currentItemID
                 insertData(dateEndTR, "date-end", currentItemID)
                 sectionTable.appendChild(dateEndTR)
 
                 var roleTR = document.createElement("tr")
-                roleTR.setAttribute("class", "item"+currentItemID)
+                roleTR.className = "item"+currentItemID
                 insertData(roleTR, "role", currentItemID)
                 sectionTable.appendChild(roleTR)
 
                 var descriptionTR = document.createElement("tr")
-                descriptionTR.setAttribute("class", "item"+currentItemID)
+                descriptionTR.className = "item"+currentItemID
                 insertData(descriptionTR, "description", currentItemID)
                 sectionTable.appendChild(descriptionTR)
 
@@ -83,43 +83,43 @@
 
             
             function insertData(tr, type, currentGeneralID){
-                var lableTextObject = {"section-title": "Section Title: ", 
-                "item-name": "Item Name: ", "role": "Role", "date-start": "Date started: ",
+                var labelTextObject = {"section-title": "Section Title: ", 
+                "item-name": "Item Name: ", "role": "Role: ", "date-start": "Date started: ",
                 "date-end": "Date ended: ", "description": "Description: "}
                 
                 var id = type + currentGeneralID
 
                 console.log(id)
-                var tdLable = document.createElement("td")
-                var lable = document.createElement("lable")
-                tdLable.appendChild(lable)
+                var tdLabel = document.createElement("td")
+                var label = document.createElement("label")
+                tdLabel.appendChild(label)
 
-                var lableText = document.createTextNode(lableTextObject[type])
-                lable.setAttribute("for", id)
-                lable.setAttribute("id", "lable" + id)
-                lable.appendChild(lableText)
+                var labelText = document.createTextNode(labelTextObject[type])
+                label.htmlFor = id
+                label.id = "label" + id
+                label.appendChild(labelText)
 
                 var tdInput = document.createElement("td")
                 
                 var input
                 if (type == "description"){
                     input = document.createElement("textarea")
-                    input.setAttribute("style", "width: 250px; height: 50px;")
+                    input.style = "width: 250px; height: 50px;"
                 }
                 else input = document.createElement("input")
                 tdInput.appendChild(input)
 
-                if (type == "section-title" || type == "item-name") input.setAttribute("required", true)
+                if (type == "section-title" || type == "item-name") input.required = true
 
-                input.setAttribute("id", id)
-                input.setAttribute("name", id)
+                input.id = id
+                input.name = id
                 if (type == "date-start" || type == "date-end"){
-                    input.setAttribute("type", "date")
-                    input.setAttribute("oninput", "setOtherAsRequired('"+ currentGeneralID + "')")
+                    input.type = "date"
+                    input.addEventListener("input", function(){setOtherAsRequired(currentGeneralID)})
                 }
-                else input.setAttribute("type", "text")
+                else input.type = "text"
 
-                tr.appendChild(tdLable)
+                tr.appendChild(tdLabel)
                 tr.appendChild(tdInput)
             }
             function setOtherAsRequired(currentGeneralID){
@@ -145,9 +145,9 @@
                 createButtonTR.appendChild(createButtonTD)
                 sectionTable.appendChild(createButtonTR)
 
-                createItemButton.setAttribute("type", "button")
-                createItemButton.setAttribute("onclick", "createItem('" + sectionTable.id + "')")
-                createItemButton.setAttribute("value", "Create More Item")
+                createItemButton.type= "button"
+                createItemButton.addEventListener("click", function(){createItem(sectionTable.id)})
+                createItemButton.value = "Create More Item"
 
                 return createButtonTR
             }
@@ -161,12 +161,12 @@
                 removeItemButtonTR.appendChild(removeItemButtonTD)
                 sectionTable.appendChild(removeItemButtonTR)
 
-                removeItemButtonTR.setAttribute("class", "item"+currentItemID)
+                removeItemButtonTR.className = "item"+currentItemID
 
-                removeItemButton.setAttribute("type", "button")
-                removeItemButton.setAttribute("onclick", "removeItem('item" + currentItemID + "')")
-                removeItemButton.setAttribute("value", "Remove this Item")
-                removeItemButton.setAttribute("id", "remove"+currentItemID)
+                removeItemButton.type = "button"
+                removeItemButton.addEventListener("click", function(){removeItem("item" + currentItemID)})
+                removeItemButton.value = "Remove this Item"
+                removeItemButton.id = "remove"+currentItemID
             }
 
             function removeItem(className){
@@ -179,21 +179,23 @@
         <h1>Resume: </h1>
         <form id = "resume" method ="POST" action = "print">
             <table>
-                <input type="submit" value = "Send Resume">
                 <tr>
-                    <td><lable for ="name">Name: </lable></td>
+                    <td><input type="submit" value = "Send Resume"></td>
+                </tr>
+                <tr>
+                    <td><label for ="name">Name: </label></td>
                     <td><input type = "text" id = "name" name = "name"></td>
                 </tr>
                 <tr>
-                    <td><lable for ="address">Address: </lable></td>
+                    <td><label for ="address">Address: </label></td>
                     <td><input type = "text" id = "address" name = "address"></td>
                 </tr>
                 <tr>
-                    <td><lable for ="email">Email: </lable></td>
+                    <td><label for ="email">Email: </label></td>
                     <td><input type = "email" id = "email" name = "email"></td>
                 </tr>
                 <tr>
-                    <td><lable for ="phone">Phone number: </lable></td>
+                    <td><label for ="phone">Phone number: </label></td>
                     <td><input type = "text" id = "phone" name = "phone"></td>
                 </tr>
             </table>
@@ -205,31 +207,28 @@
                     <td><input type = "button" onclick = "createItem('section0')" value = "Create More Item"></td>
                 </tr>
                 <tr>
-                    <td><lable for ="section-title0">Section Title: </lable></td>
+                    <td><label for ="section-title0">Section Title: </label></td>
                     <td><input type = "text" id = "section-title0" name = "section-title0" placeholder = "Ex: Work Experience" required></td>
                 </tr>
                 <tr class="item0">
-                    <td><lable for ="item-name0">Item: </lable></td>
+                    <td><label for ="item-name0">Item: </label></td>
                     <td><input type = "text" id = "item-name0" name = "item-name0" placeholder = "Ex: Mcdonald's" required></td>
                 </tr>
                 <tr class="item0">
-                    <td><lable for ="date-start0">Date Started: </lable></td>
+                    <td><label for ="date-start0">Date Started: </label></td>
                     <td><input type = "date" id = "date-start0" name = "date-start0" placeholder = "Date you started" oninput="setOtherAsRequired('0')"></td>
                 </tr>
                 <tr class="item0">
-                    <td><lable for ="date-end0">Date ended: </lable></td>
+                    <td><label for ="date-end0">Date ended: </label></td>
                     <td><input type = "date" id = "date-end0" name = "date-end0" placeholder = "Date you ended" oninput="setOtherAsRequired('0')"></td>
                 </tr>
                 <tr class="item0">
-                    <td><lable for ="role0">Role: </lable></td>
+                    <td><label for ="role0">Role: </label></td>
                     <td><input type = "text" id = "role0" name = "role0" placeholder = "Ex: Casher"></td>
                 </tr>
                 <tr class="item0">
-                    <td><lable for ="description0">Description: </lable></td>
+                    <td><label for ="description0">Description: </label></td>
                     <td><textarea id = "description0" name = "description0" style="width: 250px; height: 50px;" placeholder = "Each new line gets its own bullet point (anytime you press enter) Ex: This job entailed me to..."></textarea></td>
-                </tr>
-                <tr class="item0">
-                    <td><input type = "button" id = "remove0" onclick = "removeItem('item0')" value = "Remove this Item"></td>
                 </tr>
             </table>
         </form>
