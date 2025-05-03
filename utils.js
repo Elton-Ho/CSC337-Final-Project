@@ -58,7 +58,6 @@ function getResumeHtml(object){
     var html = `<!DOCTYPE html><html><body style ="background-color: dimgray;">`
     var username = ""
     for (item of Object.keys(object)){
-        //console.log(object[item])
         if (object[item]){
             if (item == "username") {
                 username = object[item]
@@ -66,11 +65,29 @@ function getResumeHtml(object){
             }
             if (item == "like") {
                 html += `<div style = "position:fixed; left:2%">
-                        <a id = "like-button"><img src ='/thumbsUP' style="width:50px;height:60px;" alt = "black thumbs up button"></a>
-                        <script>var user = window.localStorage.getItem('username')
-                                var likeButton = document.getElementById("like-button")
-                                likeButton.href = "/increaseLike/${username}/" + user
-                        </script>`
+                        <script>
+                                function increaseLike(){
+                                    var user = window.localStorage.getItem('username')
+                                    body = {'username':'${username}', 'user':user}
+                                    fetch("/increaseLike", {
+                                            'headers': {'Content-Type': 'application/json'},
+                                            'method': 'POST',
+                                            'body': JSON.stringify(body)
+                                        })
+                                        .then(function(res){
+                                            return res.text()
+                                        })
+                                        .then(function(text){
+                                            document.open()
+                                            document.write(text)
+                                            document.close()
+                                        })
+                                        .catch(function(err){
+                                            console.log(err)
+                                        })
+                                }
+                        </script>
+                        <img src ='/thumbsUP' id = "like-button" style="width:50px;height:60px;" alt = "black thumbs up button" onclick = "increaseLike()">`
                 html += `<h3 style = 'font-size: 17px;'>Likes: ${object[item]}</h3></div>`
             }
             if (item == "name") html += `<h2 style = 'text-align: center; margin: 0px; font-size: 19px;'>${object[item]}</h2>`

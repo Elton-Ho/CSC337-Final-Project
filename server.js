@@ -126,25 +126,25 @@ app.get("/thumbsUP", function(req, res){
     res.sendFile(path.join(rootFolder, "thumbsUP.png"))
 })
 
-app.get("/increaseLike/:username/:user", function(req, res){
+app.post("/increaseLike", function(req, res){
     client.connect()
     .then(async function(){
         var db = client.db(dbName)
         var resumesCollection = db.collection("resumes")
         var likesCollection = db.collection("likes")
-        var likesObject = await likesCollection.findOne({username: req.params.username})
-        var resumeObject = await resumesCollection.findOne({username: req.params.username})
+        var likesObject = await likesCollection.findOne({username: req.body.username})
+        var resumeObject = await resumesCollection.findOne({username: req.body.username})
         var newLikedBy = likesObject.likedBy
         
         var likeCount = parseInt(resumeObject.like)
-        if (req.params.user != "null" && !likesObject.likedBy.includes(""+req.params.user)){
+        if (req.body.user != null && !likesObject.likedBy.includes(""+req.body.user)){
             resumeObject.like = parseInt(resumeObject.like + 1)
             var html = utils.getResumeHtml(resumeObject)
             res.send(html)
-            await resumesCollection.updateOne({username: req.params.username}, {$set:{like:likeCount +=1}})
+            await resumesCollection.updateOne({username: req.body.username}, {$set:{like:likeCount +=1}})
 
-            newLikedBy.push(req.params.user)
-            await likesCollection.updateOne({username: req.params.username}, {$set:{likedBy:newLikedBy}})
+            newLikedBy.push(req.body.user)
+            await likesCollection.updateOne({username: req.body.username}, {$set:{likedBy:newLikedBy}})
             await client.close()
         }
         else {
