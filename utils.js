@@ -55,7 +55,11 @@ async function searchByString(client, collectionName, dbName, fieldName, searchS
 }
 
 function getResumeHtml(object){
-    var html = `<!DOCTYPE html><html><body style ="background-color: dimgray;">`
+    var html = `<!DOCTYPE html><html><head><style>
+        #like-button:hover {
+            cursor: pointer;
+        }
+        </style><body style ="background-color: dimgray;">`
     var username = ""
     for (item of Object.keys(object)){
         if (object[item]){
