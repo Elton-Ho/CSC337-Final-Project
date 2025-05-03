@@ -113,6 +113,16 @@ app.post('/login', async function(req, res) {
         res.send("Error logging in.");
     }
 });
+//Logout
+app.get('/logout', function(req, res) {
+    curUserName = null;
+    res.send(`
+        <script>
+            localStorage.removeItem("username");
+            window.location.href = "/";
+        </script>
+    `);
+});
 
 
 app.listen(8080, function(){
