@@ -173,11 +173,24 @@
                 var itemInputs = document.getElementsByClassName(className)
                 for (var i = itemInputs.length -1; i > -1; i--) itemInputs[i].remove()
             }
+
+            function getUsername(){
+                var usernameLS = window.localStorage.getItem("username")
+
+                console.log()
+
+                if (usernameLS){
+                    var usernameDOM = document.getElementById("username")
+                    usernameDOM.value = usernameLS
+                }
+            }
         </script>
     </head>
-    <body>
+    <body onload="getUsername()">
         <h1>Resume: </h1>
-        <form id = "resume" method ="POST" action = "print">
+        <form id = "resume" method ="POST" action = "resume_action">
+            <input type="text" id = "username" name = "username" style="visibility: hidden;">
+            <input type="number" id = "like" name = "like" style="visibility: hidden;" value = 0>
             <table>
                 <tr>
                     <td><input type="submit" value = "Send Resume"></td>
