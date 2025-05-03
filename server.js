@@ -82,7 +82,7 @@ app.post("/register", async (req, res) => {
             return res.send("Username already exists. <a href='/register'>Try again</a>")
         }
 
-        await usersCol.insertOne({ username: username, password: password }) // NOTE: Don't use plaintext passwords in real apps
+        await usersCol.insertOne({ username: username, password: password })
         res.send("Registration successful. <a href='/login'>Login now</a>")
     } catch (err) {
         console.error("Error during registration:", err)
@@ -99,7 +99,12 @@ app.post('/login', async function(req, res) {
         const user = await users.findOne({ username: username, password: password });
         if (user) {
             curUserName = username;
-            res.redirect('/');
+            res.send(`
+                <script>
+                    localStorage.setItem("username", ${JSON.stringify(username)});
+                    window.location.href = "/";
+                </script>
+            `);
         } else {
             res.send("Invalid username or password.");
         }
