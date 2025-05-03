@@ -48,7 +48,6 @@
             }
 
             function createItem(sectionTableID){
-                console.log("hi")
                 var sectionTable = document.getElementById(sectionTableID)
 
                 currentItemID += 1
@@ -89,7 +88,6 @@
                 
                 var id = type + currentGeneralID
 
-                console.log(id)
                 var tdLabel = document.createElement("td")
                 var label = document.createElement("label")
                 tdLabel.appendChild(label)
@@ -177,8 +175,6 @@
             function getUsername(){
                 var usernameLS = window.localStorage.getItem("username")
 
-                console.log()
-
                 if (usernameLS){
                     var usernameDOM = document.getElementById("username")
                     usernameDOM.value = usernameLS
@@ -187,7 +183,7 @@
         </script>
     </head>
     <body onload="getUsername()">
-        <h1>Resume: </h1>
+        <h1>Create/update your own resume page: </h1>
         <form id = "resume" method ="POST" action = "resume_action">
             <input type="text" id = "username" name = "username" style="visibility: hidden;">
             <input type="number" id = "like" name = "like" style="visibility: hidden;" value = 0>
