@@ -85,11 +85,14 @@ app.post("/resume_action", express.urlencoded({ extended: true }), function(req,
         var resumesCollection = db.collection("resumes")
         var likesCollection = db.collection("likes")
         var resume = await resumesCollection.findOne({username: req.body.username})
-        if (resume) 
-            return resumesCollection.updateOne({username: req.body.username}, {$set:req.body})
-        else
+        if (resume){
+            await resumesCollection.remove({username: req.body.username})
+            return resumesCollection.insertOne({username: req.body.username}, req.body)
+        }
+        else{
             await likesCollection.insertOne({username: req.body.username, likedBy:[]})
-            await resumesCollection.insertOne(req.body)
+            return resumesCollection.insertOne(req.body)
+        }
     })
     .then(function(){
         var html = utils.getResumeHtml(req.body)
@@ -120,7 +123,7 @@ app.get("/increaseLike/:username/:user", function(req, res){
         
         var likeCount = parseInt(resumeObject.like)
         if (!likesObject.likedBy.includes(""+req.params.user)){
-            resumeObject.like +=1
+            resumeObject.like = parseInt(resumeObject.like + 1)
             var html = utils.getResumeHtml(resumeObject)
             res.send(html)
             await resumesCollection.updateOne({username: req.params.username}, {$set:{like:likeCount +=1}})
