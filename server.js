@@ -69,6 +69,94 @@ app.get('/src.js', function (req, res){
     res.sendFile(path.join(rootFolder, 'src.js'))
 })
 
+app.get("/resume_form", function(req,res){
+    res.sendFile(path.join(rootFolder, "resume-form.html"))
+})
+
+app.get("/view-resume/:username", function(req,res){
+    client.connect()
+    .then(function(){
+        var db = client.db(dbName)
+        var resumes = db.collection("resumes")
+        return resumes.findOne({username: req.params.username})
+    })
+    .then(function(found){
+        var html = utils.getResumeHtml(found)
+        res.send(html)
+    })
+    .catch(function(err){
+        console.log(err)
+    })
+    .finally(function(){
+        client.close()
+    })
+    
+})
+
+app.post("/resume_action", express.urlencoded({ extended: true }), function(req,res){
+    if (req.body.username != ""){
+        client.connect()
+        .then(async function(){
+            var db = client.db(dbName)
+            var resumesCollection = db.collection("resumes")
+            var likesCollection = db.collection("likes")
+            var resume = await resumesCollection.findOne({username: req.body.username})
+            if (resume)
+                await resumesCollection.deleteOne({username: req.body.username})
+            else
+                await likesCollection.insertOne({username: req.body.username, likedBy:[]})
+            return resumesCollection.insertOne(req.body)
+        })
+        .then(function(){
+            var html = utils.getResumeHtml(req.body)
+            res.send(html)
+        })
+        .catch(function(err){
+            console.log(err)
+        })
+        .finally(function(){
+            client.close()
+        })
+    }
+    else res.sendFile(path.join(rootFolder, 'please-login.html'))
+    
+})
+
+app.get("/thumbsUP", function(req, res){
+    res.sendFile(path.join(rootFolder, "thumbsUP.png"))
+})
+
+app.get("/increaseLike/:username/:user", function(req, res){
+    client.connect()
+    .then(async function(){
+        var db = client.db(dbName)
+        var resumesCollection = db.collection("resumes")
+        var likesCollection = db.collection("likes")
+        var likesObject = await likesCollection.findOne({username: req.params.username})
+        var resumeObject = await resumesCollection.findOne({username: req.params.username})
+        var newLikedBy = likesObject.likedBy
+        
+        var likeCount = parseInt(resumeObject.like)
+        if (req.params.user != "null" && !likesObject.likedBy.includes(""+req.params.user)){
+            resumeObject.like = parseInt(resumeObject.like + 1)
+            var html = utils.getResumeHtml(resumeObject)
+            res.send(html)
+            await resumesCollection.updateOne({username: req.params.username}, {$set:{like:likeCount +=1}})
+
+            newLikedBy.push(req.params.user)
+            await likesCollection.updateOne({username: req.params.username}, {$set:{likedBy:newLikedBy}})
+            await client.close()
+        }
+        else {
+            var html = utils.getResumeHtml(resumeObject)
+            res.send(html)
+        }
+    })
+    .catch(function(err){
+        console.log(err)
+    })
+})
+
 app.get('/curuser', function (req, res){
     res.send(curUserName)
 })

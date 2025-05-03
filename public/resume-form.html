@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Submit Your Own Resume</title>
+        <style>
+            table{
+                margin-left: 10px;
+                margin-bottom: 10px;
+                background-color: black;
+                color: white;
+            }
+            body{
+                background-color: dimgray;
+            }
+        </style>
+        <script>
+            var currentSectionID = 0 // first one already created with id 0
+            var currentItemID = 0 // first one already created with id 0
+
+            function createSection(){
+                var resume = document.getElementById("resume")
+                var sectionTable = document.createElement("table")
+                resume.appendChild(sectionTable)
+
+                currentSectionID += 1
+
+                var sectionTableID = "section"+currentSectionID
+                sectionTable.id = sectionTableID
+
+                var createButtonTR = createItemButton(sectionTable)
+
+                var removeSectionButton = document.createElement("input")
+                var removeSectionTD = document.createElement("td")
+                removeSectionTD.appendChild(removeSectionButton)
+                createButtonTR.appendChild(removeSectionTD)
+
+                removeSectionButton.type = "button"
+                removeSectionButton.addEventListener("click", function(){document.getElementById(sectionTableID).remove()})
+                removeSectionButton.value = "Remove this section"
+
+                // create section title
+                var sectionTitleTR = document.createElement("tr")
+                insertData(sectionTitleTR, "section-title", sectionTableID)
+                sectionTable.appendChild(sectionTitleTR)
+
+                // make the first element
+                createItem(sectionTableID)       
+            }
+
+            function createItem(sectionTableID){
+                var sectionTable = document.getElementById(sectionTableID)
+
+                currentItemID += 1
+
+                var itemNameTR = document.createElement("tr")
+                itemNameTR.className =  "item"+currentItemID
+                insertData(itemNameTR, "item-name", currentItemID)
+                sectionTable.appendChild(itemNameTR)
+
+                var dateStartTR = document.createElement("tr")
+                dateStartTR.className = "item"+currentItemID
+                insertData(dateStartTR, "date-start", currentItemID)
+                sectionTable.appendChild(dateStartTR)
+
+                var dateEndTR = document.createElement("tr")
+                dateEndTR.className = "item"+currentItemID
+                insertData(dateEndTR, "date-end", currentItemID)
+                sectionTable.appendChild(dateEndTR)
+
+                var roleTR = document.createElement("tr")
+                roleTR.className = "item"+currentItemID
+                insertData(roleTR, "role", currentItemID)
+                sectionTable.appendChild(roleTR)
+
+                var descriptionTR = document.createElement("tr")
+                descriptionTR.className = "item"+currentItemID
+                insertData(descriptionTR, "description", currentItemID)
+                sectionTable.appendChild(descriptionTR)
+
+                removeItemButton(sectionTable, currentItemID)
+            }
+
+            
+            function insertData(tr, type, currentGeneralID){
+                var labelTextObject = {"section-title": "Section Title: ", 
+                "item-name": "Item Name: ", "role": "Role: ", "date-start": "Date started: ",
+                "date-end": "Date ended: ", "description": "Description: "}
+                
+                var id = type + currentGeneralID
+
+                var tdLabel = document.createElement("td")
+                var label = document.createElement("label")
+                tdLabel.appendChild(label)
+
+                var labelText = document.createTextNode(labelTextObject[type])
+                label.htmlFor = id
+                label.id = "label" + id
+                label.appendChild(labelText)
+
+                var tdInput = document.createElement("td")
+                
+                var input
+                if (type == "description"){
+                    input = document.createElement("textarea")
+                    input.style = "width: 250px; height: 50px;"
+                }
+                else input = document.createElement("input")
+                tdInput.appendChild(input)
+
+                if (type == "section-title" || type == "item-name") input.required = true
+
+                input.id = id
+                input.name = id
+                if (type == "date-start" || type == "date-end"){
+                    input.type = "date"
+                    input.addEventListener("input", function(){setOtherAsRequired(currentGeneralID)})
+                }
+                else input.type = "text"
+
+                tr.appendChild(tdLabel)
+                tr.appendChild(tdInput)
+            }
+            function setOtherAsRequired(currentGeneralID){
+                // if one date is being filled out the other needs to be too
+                var dateStartInput = document.getElementById("date-start"+currentGeneralID)
+                var dateEndInput = document.getElementById("date-end"+currentGeneralID)
+                if (dateStartInput.value || dateEndInput.value){
+                    dateStartInput.required = true
+                    dateEndInput.required = true
+                }
+                else{
+                    dateStartInput.required = false
+                    dateEndInput.required = false
+                }
+            }
+
+            function createItemButton(sectionTable){
+                var createItemButton = document.createElement("input")
+
+                var createButtonTR = document.createElement("tr")
+                var createButtonTD = document.createElement("td")
+                createButtonTD.appendChild(createItemButton)
+                createButtonTR.appendChild(createButtonTD)
+                sectionTable.appendChild(createButtonTR)
+
+                createItemButton.type= "button"
+                createItemButton.addEventListener("click", function(){createItem(sectionTable.id)})
+                createItemButton.value = "Create More Item"
+
+                return createButtonTR
+            }
+
+            function removeItemButton(sectionTable, currentItemID){
+                var removeItemButton = document.createElement("input")
+
+                var removeItemButtonTR = document.createElement("tr")
+                var removeItemButtonTD = document.createElement("td")
+                removeItemButtonTD.appendChild(removeItemButton)
+                removeItemButtonTR.appendChild(removeItemButtonTD)
+                sectionTable.appendChild(removeItemButtonTR)
+
+                removeItemButtonTR.className = "item"+currentItemID
+
+                removeItemButton.type = "button"
+                removeItemButton.addEventListener("click", function(){removeItem("item" + currentItemID)})
+                removeItemButton.value = "Remove this Item"
+                removeItemButton.id = "remove"+currentItemID
+            }
+
+            function removeItem(className){
+                var itemInputs = document.getElementsByClassName(className)
+                for (var i = itemInputs.length -1; i > -1; i--) itemInputs[i].remove()
+            }
+
+            function getUsername(){
+                var usernameLS = window.localStorage.getItem("username")
+
+                if (usernameLS){
+                    var usernameDOM = document.getElementById("username")
+                    usernameDOM.value = usernameLS
+                }
+            }
+        </script>
+    </head>
+    <body onload="getUsername()">
+        <h1>Create/update your own resume page: </h1>
+        <form id = "resume" method ="POST" action = "resume_action">
+            <input type="text" id = "username" name = "username" style="visibility: hidden;">
+            <input type="number" id = "like" name = "like" style="visibility: hidden;" value = 0>
+            <table>
+                <tr>
+                    <td><input type="submit" value = "Send Resume"></td>
+                </tr>
+                <tr>
+                    <td><label for ="name">Name: </label></td>
+                    <td><input type = "text" id = "name" name = "name"></td>
+                </tr>
+                <tr>
+                    <td><label for ="address">Address: </label></td>
+                    <td><input type = "text" id = "address" name = "address"></td>
+                </tr>
+                <tr>
+                    <td><label for ="email">Email: </label></td>
+                    <td><input type = "email" id = "email" name = "email"></td>
+                </tr>
+                <tr>
+                    <td><label for ="phone">Phone number: </label></td>
+                    <td><input type = "text" id = "phone" name = "phone"></td>
+                </tr>
+            </table>
+            <br>
+            <input type = "button" onclick = "createSection()" value = "Add More Section">
+            <br>
+            <table id = "section0">
+                <tr>
+                    <td><input type = "button" onclick = "createItem('section0')" value = "Create More Item"></td>
+                </tr>
+                <tr>
+                    <td><label for ="section-title0">Section Title: </label></td>
+                    <td><input type = "text" id = "section-title0" name = "section-title0" placeholder = "Ex: Work Experience" required></td>
+                </tr>
+                <tr class="item0">
+                    <td><label for ="item-name0">Item: </label></td>
+                    <td><input type = "text" id = "item-name0" name = "item-name0" placeholder = "Ex: Mcdonald's" required></td>
+                </tr>
+                <tr class="item0">
+                    <td><label for ="date-start0">Date Started: </label></td>
+                    <td><input type = "date" id = "date-start0" name = "date-start0" placeholder = "Date you started" oninput="setOtherAsRequired('0')"></td>
+                </tr>
+                <tr class="item0">
+                    <td><label for ="date-end0">Date ended: </label></td>
+                    <td><input type = "date" id = "date-end0" name = "date-end0" placeholder = "Date you ended" oninput="setOtherAsRequired('0')"></td>
+                </tr>
+                <tr class="item0">
+                    <td><label for ="role0">Role: </label></td>
+                    <td><input type = "text" id = "role0" name = "role0" placeholder = "Ex: Casher"></td>
+                </tr>
+                <tr class="item0">
+                    <td><label for ="description0">Description: </label></td>
+                    <td><textarea id = "description0" name = "description0" style="width: 250px; height: 50px;" placeholder = "Each new line gets its own bullet point (anytime you press enter) Ex: This job entailed me to..."></textarea></td>
+                </tr>
+            </table>
+        </form>
+    </body>
+</html>
