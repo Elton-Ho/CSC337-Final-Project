@@ -20,6 +20,40 @@ async function insertRecord(collection, obj)
     }
 }
 
+async function fullInsert(client, collectionName, dbName, obj)
+{
+    try{
+        const coll = await getDB(client, collectionName, dbName);
+        await insertRecord(coll, obj)
+        return true;
+    }catch (err)
+    {
+        return false
+    }finally {
+        client.close()
+    }
+}
+
+async function searchByString(client, collectionName, dbName, fieldName, searchStr)
+{
+    try{
+        const coll = await getDB(client, collectionName, dbName);
+        if(searchStr === "")
+        {
+            return await coll.find().toArray()
+        }
+        const query = {
+            [fieldName]: { $regex: searchStr, $options: 'i' }
+        }
+        return await coll.find(query).toArray()
+    }catch (err)
+    {
+        return null
+    }finally {
+        client.close()
+    }
+}
+
 function getResumeHtml(object){
     var html = `<!DOCTYPE html><html><body style ="background-color: dimgray;">`
     var username = ""
@@ -61,4 +95,4 @@ function getResumeHtml(object){
     return html
 }
 
-module.exports = { getDB, insertRecord, getResumeHtml}
+module.exports = { getDB, insertRecord, getResumeHtml, fullInsert, searchByString}

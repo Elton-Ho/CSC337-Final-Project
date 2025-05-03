@@ -14,8 +14,11 @@ const utils = require("./utils")
 
 //GLOBALS
 var rootFolder = path.join(__dirname, 'public/')
-var curUserName = null;
+var curUserName = "exUser";
+var jobToView = "Test1"
 
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 //PAGE REQUESTS
 app.get("/", function(req,res){ // homepage
     res.sendFile(path.join(rootFolder, 'index.html'))
@@ -25,23 +28,35 @@ app.get('/postjob', function (req, res){
     res.sendFile(path.join(rootFolder, 'postjob.html'))
 })
 
+app.get('/displayjobs', function (req, res){
+    res.sendFile(path.join(rootFolder, 'displayJobs.html'))
+})
+
+app.get('/viewjob', function (req, res){
+    res.sendFile(path.join(rootFolder, 'viewjob.html'))
+})
+
 //FORM SUBMISSION
-app.post('/sendjob', express.urlencoded({'extended':true}), function(req, res){
-    res.sendFile(path.join(rootFolder, 'processing.html'))
+app.post('/sendjob', express.urlencoded({'extended':true}), function (req, res) {
     var q = req.body
-    var toSer = {'poster':curUserName,'title':q.title,'salaryMin':q.salaryMin,'salaryMax':q.salaryMax,'reqs':q.reqs, 'desc':q.desc}
-    utils.getDB(client, "job", dbName).then(
-        function(collection){
-            return utils.insertRecord(collection, toSer)
-        }
-    ).then(
-        function(ret){
+    var toSer = {
+        'poster': curUserName,
+        'title': q.title,
+        'salaryMin': q.salaryMin,
+        'salaryMax': q.salaryMax,
+        'reqs': q.reqs,
+        'desc': q.desc
+    }
+    utils.fullInsert(client, "job", dbName, toSer).then(function(success){
+        if(success)
+        {
             res.sendFile(path.join(rootFolder, 'submissionsuccess.html'))
         }
-        ).catch(
-            function (err) {
-                res.sendFile(path.join(rootFolder, 'submissionfailure.html'))
-            })
+        else
+        {
+            res.sendFile(path.join(rootFolder, 'submissionfailure.html'))
+        }
+    } )
 })
 
 
@@ -142,6 +157,157 @@ app.get("/increaseLike/:username/:user", function(req, res){
     })
 })
 
+app.get('/curuser', function (req, res){
+    res.send(curUserName)
+})
+
+app.get('/getcurjob', async function (req, res){
+    utils.searchByString(client, "job", dbName, "title", jobToView).then(arr => res.json(arr))
+
+})
+
+app.get('/getjobs', async function (req, res){
+    utils.searchByString(client, "job", dbName, "title", req.query.search).then(arr => res.json(arr))
+
+})
+
+// User login system
+
+// Page routes
+app.get('/login', function(req, res) {
+    res.sendFile(path.join(rootFolder, 'login.html'));
+});
+
+app.get('/register', function(req, res) {
+    res.sendFile(path.join(rootFolder, 'register.html'));
+});
+
+// Handle registration
+app.post("/register", async (req, res) => {
+    const { username, password } = req.body
+    if (!username || !password) {
+        return res.send("Missing username or password.")
+    }
+
+    try {
+        const usersCol = await utils.getDB(client, "users", dbName)
+        const existingUser = await usersCol.findOne({ username: username })
+
+        if (existingUser) {
+            return res.send("Username already exists. <a href='/register'>Try again</a>")
+        }
+
+        await usersCol.insertOne({ username: username, password: password })
+        res.send("Registration successful. <a href='/login'>Login now</a>")
+    } catch (err) {
+        console.error("Error during registration:", err)
+        res.status(500).send("Internal Server Error.")
+    }
+})
+
+
+// Handle login
+app.post('/login', async function(req, res) {
+    const { username, password } = req.body;
+    try {
+        const users = await utils.getDB(client, "users", dbName);
+        const user = await users.findOne({ username: username, password: password });
+        if (user) {
+            curUserName = username;
+            res.send(`
+                <script>
+                    localStorage.setItem("username", ${JSON.stringify(username)});
+                    window.location.href = "/";
+                </script>
+            `);
+        } else {
+            res.send("Invalid username or password.");
+        }
+    } catch (err) {
+        console.error(err);
+        res.send("Error logging in.");
+    }
+});
+//Logout
+app.get('/logout', function(req, res) {
+    curUserName = null;
+    res.send(`
+        <script>
+            localStorage.removeItem("username");
+            window.location.href = "/";
+        </script>
+    `);
+});
+
+// User login system
+
+// Page routes
+app.get('/login', function(req, res) {
+    res.sendFile(path.join(rootFolder, 'login.html'));
+});
+
+app.get('/register', function(req, res) {
+    res.sendFile(path.join(rootFolder, 'register.html'));
+});
+
+// Handle registration
+app.post("/register", async (req, res) => {
+    const { username, password, email } = req.body
+    if (!username || !password || !email) {
+        return res.send("Missing username or password.")
+    }
+
+    try {
+        const usersCol = await utils.getDB(client, "users", dbName)
+        const existingUser = await usersCol.findOne({ username: username })
+
+        if (existingUser) {
+            return res.send("Username already exists. <a href='/register'>Try again</a>")
+        }
+
+        await usersCol.insertOne({ username: username, password: password, email:email })
+        res.send("Registration successful. <a href='/login'>Login now</a>")
+    } catch (err) {
+        console.error("Error during registration:", err)
+        res.status(500).send("Internal Server Error.")
+    }
+})
+
+
+// Handle login
+app.post('/login', async function(req, res) {
+    const { username, password } = req.body;
+    try {
+        const users = await utils.getDB(client, "users", dbName);
+        const user = await users.findOne({ username: username, password: password });
+        if (user) {
+            curUserName = username;
+            res.send(`
+                <script>
+                    localStorage.setItem("username", ${JSON.stringify(username)});
+                    window.location.href = "/";
+                </script>
+            `);
+        } else {
+            res.send("Invalid username or password.");
+        }
+    } catch (err) {
+        console.error(err);
+        res.send("Error logging in.");
+    }
+});
+//Logout
+app.get('/logout', function(req, res) {
+    curUserName = null;
+    res.send(`
+        <script>
+            localStorage.removeItem("username");
+            window.location.href = "/";
+        </script>
+    `);
+});
+
+//LISTEN
 app.listen(8080, function(){
     console.log("Server running localhost:8080/")
 })
