@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jobs</title>
+</head>
+<script>
+  function populateJobs()
+  {
+      const search = document.getElementById("search").value;
+      const main = document.getElementById("alljobs")
+
+      const params = new URLSearchParams({ search });
+      const query = `getjobs?${params.toString()}`;
+      fetch(query).then(res => res.json()).then(function(arr)
+      {
+          for(const ind in arr)
+          {
+              var job = arr[ind]
+              const newNode = document.getElementsByTagName("template")[0].content.cloneNode(true);
+              const title = newNode.querySelector(".title")
+              const poster = newNode.querySelector(".poster")
+              const salRange = newNode.querySelector(".salary")
+              const link = newNode.querySelector(".link")
+              title.innerText += job["title"];
+              poster.innerText += job["poster"]
+              salRange.innerText += `${job["salaryMin"]}-${job["salaryMax"]}`
+              link.href = `/viewjob?job=${job["title"]}`
+              main.appendChild(newNode)
+          }
+      })
+  }
+</script>
+<style>
+    .scroll-list {
+        height: 200px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+    }
+</style>
+<template>
+    <div>
+        <h1 class="title"></h1>
+        <p class="poster"></p>
+        <p class="salary"></p>
+        <a class="link">View job</a>
+    </div>
+</template>
+<body>
+<label>Search Job Title: <input type="text" onchange="populateJobs()" id="search"></label>
+<div id="alljobs" class="scroll-list">
+
+</div>
+</body>
+</html>
