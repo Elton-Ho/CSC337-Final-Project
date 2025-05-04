@@ -3,9 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
+    <style>
+        body{
+            background-color: dimgray;
+        }
+    </style>
 </head>
 <script src="src.js"></script>
 <body onload="addHeader()">
-
+    <h1>Home page</h1>
+    <p>Welcome to our job/resume posting website. You can:
+    <ul>
+        <li>Post jobs for people to apply to</li>
+        <li>Post a resume for others to look at</li>
+        <li>"Like" other peoples resumes once</li>
+    </ul>
+        To view other peoples resume go to "http://localhost:8080/view-resume/their-username"
+        and replace "their-username" in that url with the username of the person who's resume you want to see.
+    </p>
 </body>
 </html>

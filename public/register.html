@@ -1,13 +1,35 @@
 <!DOCTYPE html>
 <html>
-<head><title>Register</title></head>
-<body>
-  <h2>Register</h2>
+<head>
+  <title>Register</title>
+  <style>
+    body{
+      background-color: dimgray;
+    }
+    table{
+      margin-left: 10px;
+      margin-bottom: 10px;
+      background-color: black;
+      color: white;
+    }
+  </style>
+  <script src="src.js"></script>
+</head>
+<body onload="addHeader()">
+  <h1>Register</h1>
   <form method="POST" action="/register">
-    Username: <input name="username" required><br>
-    Password: <input name="password" type="password" required><br>
-    Email: <input name="email" type="email" required><br>
-    <input type="submit" value="Register">
+    <table>
+      <tr><td>Username: </td>
+          <td><input name="username" required></td>
+      </tr>
+      <tr><td>Password: </td>
+        <td><input name="password" type="password" required></td>
+      </tr>
+      <tr><td>Email: </td>
+        <td><input name="email" type="email" required></td>
+      </tr>
+      <tr><td><input type="submit" value="Register"></td></tr>
+    </table>
   </form>
 </body>
 </html>

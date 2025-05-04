@@ -3,20 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <title>Post Job</title>
+    <style>
+        body{
+            background-color: dimgray;
+        }
+        table{
+                margin-left: 10px;
+                margin-bottom: 10px;
+                background-color: black;
+                color: white;
+        }
+    </style>
 </head>
 <script src="src.js"></script>
 <body onload="addHeader()">
     <h1>Post a Job</h1>
     <form method="POST" action="sendjob">
-        <label>Job Title: <input type="text" name="title"></label>
-        <br>
-        <label>Salary Range: <input type="number" name="salaryMin"><input type="number" name="salaryMax"></label>
-        <br>
-        <label>Job Requirements: <textarea name="reqs"></textarea></label>
-        <br>
-        <label>Job Description: <textarea name="desc"></textarea></label>
-        <br>
-        <input type="submit">
+        <table>
+            <tr><td><label for >Job Title: </label></td>
+                <td><input type="text" name="title" id="title"></td>
+            </tr>
+            <tr><td><label>Salary Range: </label></td>
+                <td><input type="number" name="salaryMin"></td>
+                <td><input type="number" name="salaryMax"></td>
+            </tr>    
+            <tr><td><label for="reqs">Job Requirements: </label></td>
+                <td><textarea name="reqs" id="reqs"></textarea></td>
+            </tr>
+            <tr><td><label for="desc">Job Description: </label></td>
+                <td><textarea name="desc" id="desc"></textarea></td>
+            </tr>
+            <tr><td><input type="submit"></td></tr>
+        </table>
     </form>
 </body>
 </html>
