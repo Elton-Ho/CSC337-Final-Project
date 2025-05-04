@@ -189,7 +189,6 @@ app.post("/increaseLike", async function(req, res){
 
             newLikedBy.push(req.body.user)
             await likesCollection.updateOne({username: req.body.username}, {$set:{likedBy:newLikedBy}})
-            await client.close()
         }
         else {
             var html = utils.getResumeHtml(resumeObject)
