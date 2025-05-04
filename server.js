@@ -126,30 +126,27 @@ app.get('/src.js', function (req, res){
     res.sendFile(path.join(rootFolder, 'src.js'))
 })
 
-app.get("/view-resume/:username", function(req,res){
-    client.connect()
-    .then(function(){
+app.get("/view-resume/:username", async function(req,res){
+    try{
         var db = client.db(dbName)
         var resumes = db.collection("resume")
-        return resumes.findOne({username: req.params.username})
-    })
-    .then(function(found){
-        var html = utils.getResumeHtml(found)
-        res.send(html)
-    })
-    .catch(function(err){
+        var resumeFound = await resumes.findOne({username: req.params.username})
+        if (resumeFound){
+            var html = utils.getResumeHtml(resumeFound)
+            res.send(html)
+        }
+        else{
+            res.send(`<html><body>Resume not found</body></html>`)
+        }  
+    }
+    catch(err){
         console.log(err)
-    })
-    .finally(function(){
-        client.close()
-    })
-    
+    }
 })
 
-app.post("/resume_action", express.urlencoded({ extended: true }), function(req,res){
-    if (req.body.username != ""){
-        client.connect()
-        .then(async function(){
+app.post("/resume_action", express.urlencoded({ extended: true }), async function(req,res){
+    try{
+        if (req.body.username != ""){
             var db = client.db(dbName)
             var resumesCollection = db.collection("resume")
             var likesCollection = db.collection("likes")
@@ -158,20 +155,15 @@ app.post("/resume_action", express.urlencoded({ extended: true }), function(req,
                 await resumesCollection.deleteOne({username: req.body.username})
             else
                 await likesCollection.insertOne({username: req.body.username, likedBy:[]})
-            return resumesCollection.insertOne(req.body)
-        })
-        .then(function(){
+            await resumesCollection.insertOne(req.body)
             var html = utils.getResumeHtml(req.body)
             res.send(html)
-        })
-        .catch(function(err){
-            console.log(err)
-        })
-        .finally(function(){
-            client.close()
-        })
+        }
+        else res.sendFile(path.join(rootFolder, 'please-login.html'))
     }
-    else res.sendFile(path.join(rootFolder, 'please-login.html'))
+    catch(err){
+        console.log(err)
+    }
     
 })
 
@@ -179,9 +171,8 @@ app.get("/thumbsUP", function(req, res){
     res.sendFile(path.join(rootFolder, "thumbsUP.png"))
 })
 
-app.post("/increaseLike", function(req, res){
-    client.connect()
-    .then(async function(){
+app.post("/increaseLike", async function(req, res){
+    try{
         var db = client.db(dbName)
         var resumesCollection = db.collection("resume")
         var likesCollection = db.collection("likes")
@@ -204,10 +195,10 @@ app.post("/increaseLike", function(req, res){
             var html = utils.getResumeHtml(resumeObject)
             res.send(html)
         }
-    })
-    .catch(function(err){
+    }
+    catch(err){
         console.log(err)
-    })
+    }
 })
 
 app.get('/curuser', function (req, res){

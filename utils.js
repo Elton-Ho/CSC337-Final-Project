@@ -81,7 +81,8 @@ function getResumeHtml(object){
         #like-button:hover {
             cursor: pointer;
         }
-        </style><body style ="background-color: dimgray;">`
+        </style><script src="/src.js"></script></head>
+        <body style ="background-color: dimgray;" onload = "addHeader()">`
     var username = ""
     for (let item of Object.keys(object)){
         //console.log(object[item])
