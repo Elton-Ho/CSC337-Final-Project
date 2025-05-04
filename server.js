@@ -77,7 +77,7 @@ app.get('/apply', function (req, res){
         res.sendFile(path.join(rootFolder, 'please-login.html'))
     }
     var toSer = {
-        'user':curUserName,
+        'username':curUserName,
         'jid':viewJobId
     }
     utils.searchByObj(client, "application", dbName, toSer).then(function (arr)
@@ -220,7 +220,7 @@ app.get('/getjobsbyposter', async function (req, res){
 app.get('/applicants', async function (req, res){
     utils.getColl(client, "application", dbName).then(coll => coll.aggregate([
         {
-            $match: { jobId: viewJobId }
+            $match: { jid: viewJobId }
         },
         {
             $lookup: {
@@ -236,7 +236,9 @@ app.get('/applicants', async function (req, res){
         {
             $replaceWith: "$user"
         }
-    ]).toArray()).then( arr => res.json(arr))
+    ]).toArray()).then( function(arr){
+        res.json(arr)
+    })
 
 })
 
