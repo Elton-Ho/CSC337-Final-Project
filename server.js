@@ -136,7 +136,7 @@ app.get("/view-resume/:username", async function(req,res){
             res.send(html)
         }
         else{
-            res.send(`<html><body>Resume not found</body></html>`)
+            res.sendFile(path.join(rootFolder, "resumenotfound.html"))
         }  
     }
     catch(err){
@@ -263,79 +263,11 @@ app.post("/register", async (req, res) => {
         const existingUser = await usersCol.findOne({ username: username })
 
         if (existingUser) {
-            return res.send("Username already exists. <a href='/register'>Try again</a>")
-        }
-
-        await usersCol.insertOne({ username: username, password: password, email: email })
-        res.send("Registration successful. <a href='/login'>Login now</a>")
-    } catch (err) {
-        console.error("Error during registration:", err)
-        res.status(500).send("Internal Server Error.")
-    }
-})
-
-
-// Handle login
-app.post('/login', async function(req, res) {
-    const { username, password } = req.body;
-    try {
-        const users = await utils.getColl(client, "user", dbName);
-        const user = await users.findOne({ username: username, password: password });
-        if (user) {
-            curUserName = username;
-            res.send(`
-                <script>
-                    localStorage.setItem("username", ${JSON.stringify(username)});
-                    window.location.href = "/";
-                </script>
-            `);
-        } else {
-            res.send("Invalid username or password.");
-        }
-    } catch (err) {
-        console.error(err);
-        res.send("Error logging in.");
-    }
-});
-//Logout
-app.get('/logout', function(req, res) {
-    curUserName = null;
-    res.send(`
-        <script>
-            localStorage.removeItem("username");
-            window.location.href = "/";
-        </script>
-    `);
-});
-
-// User login system
-
-// Page routes
-app.get('/login', function(req, res) {
-    res.sendFile(path.join(rootFolder, 'login.html'));
-});
-
-app.get('/register', function(req, res) {
-    res.sendFile(path.join(rootFolder, 'register.html'));
-});
-
-// Handle registration
-app.post("/register", async (req, res) => {
-    const { username, password, email } = req.body
-    if (!username || !password || !email) {
-        return res.send("Missing username or password.")
-    }
-
-    try {
-        const usersCol = await utils.getColl(client, "user", dbName)
-        const existingUser = await usersCol.findOne({ username: username })
-
-        if (existingUser) {
-            return res.send("Username already exists. <a href='/register'>Try again</a>")
+            return res.sendFile(path.join(rootFolder, 'exsistingusererror.html'))
         }
 
         await usersCol.insertOne({ username: username, password: password, email:email })
-        res.send("Registration successful. <a href='/login'>Login now</a>")
+        res.sendFile(path.join(rootFolder, 'registersuccess.html'))
     } catch (err) {
         console.error("Error during registration:", err)
         res.status(500).send("Internal Server Error.")
@@ -358,7 +290,7 @@ app.post('/login', async function(req, res) {
                 </script>
             `);
         } else {
-            res.send("Invalid username or password.");
+            res.sendFile(path.join(rootFolder, 'wronglogin.html'));
         }
     } catch (err) {
         console.error(err);
