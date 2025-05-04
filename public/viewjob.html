@@ -59,7 +59,7 @@
                 const link = newNode.querySelector(".link")
                 username.innerText += app["username"]
                 email.innerText += app["email"]
-                link.href = `own_resume/${app["username"]}`
+                link.href = `view-resume/${app["username"]}`
                 main.appendChild(newNode)
             }
         }).catch(function (err){console.log(`ERR: ${err}`)})
