@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MyPostings</title>
+</head>
+<script>
+  function populateJobs()
+  {
+
+    const main = document.getElementById("alljobs")
+
+    const query = `getjobsbyposter`;
+    fetch(query).then(res => res.json()).then(function(arr)
+    {
+      for(const ind in arr)
+      {
+        var job = arr[ind]
+        const newNode = document.getElementsByTagName("template")[0].content.cloneNode(true);
+        const title = newNode.querySelector(".title")
+        const link = newNode.querySelector(".link")
+        title.innerText += job["title"];
+        link.href = `/viewjob?job=${job["title"]}&jid=${job["_id"]}`
+        main.appendChild(newNode)
+      }
+    }).catch(function (err){console.log(`ERR: ${err}`)})
+  }
+  window.addEventListener("DOMContentLoaded", () => {
+      addHeader()
+  })
+</script>
+<script src="src.js"></script>
+<style>
+  .scroll-list {
+    height: 90%;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+  }
+</style>
+<template>
+  <div>
+    <h1 class="title"></h1>
+    <a class="link">View job</a>
+  </div>
+</template>
+<body onload="populateJobs()">
+<div id="alljobs" class="scroll-list">
+
+</div>
+</body>
+</html>

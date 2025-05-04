@@ -180,7 +180,11 @@
                     usernameDOM.value = usernameLS
                 }
             }
+            window.addEventListener("DOMContentLoaded", () => {
+                addHeader()
+            })
         </script>
+        <script src="src.js"></script>
     </head>
     <body onload="getUsername()">
         <h1>Create/update your own resume page: </h1>

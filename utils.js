@@ -1,7 +1,6 @@
-async function getDB(client, collectionName, dbName)
+async function getColl(client, collectionName, dbName)
 {
     try {
-        await client.connect();
         const db = await client.db(dbName);
         return await db.collection(collectionName)
     } catch (error) {
@@ -23,41 +22,64 @@ async function insertRecord(collection, obj)
 async function fullInsert(client, collectionName, dbName, obj)
 {
     try{
-        const coll = await getDB(client, collectionName, dbName);
+        const coll = await getColl(client, collectionName, dbName);
         await insertRecord(coll, obj)
         return true;
     }catch (err)
     {
         return false
-    }finally {
-        client.close()
     }
 }
 
 async function searchByString(client, collectionName, dbName, fieldName, searchStr)
 {
     try{
-        const coll = await getDB(client, collectionName, dbName);
+        const coll = await getColl(client, collectionName, dbName);
         if(searchStr === "")
         {
             return await coll.find().toArray()
         }
-        const query = {
-            [fieldName]: { $regex: searchStr, $options: 'i' }
+        var query;
+        if(fieldName !== "_id")
+        {
+            query = {
+                [fieldName]: { $regex: searchStr, $options: 'i' }
+            }
+        }
+        else
+        {
+            query = {[fieldName]: searchStr}
         }
         return await coll.find(query).toArray()
     }catch (err)
     {
         return null
-    }finally {
-        client.close()
+    }
+}
+
+async function searchByObj(client, collectionName, dbName, fieldValues)
+{
+    try{
+        const coll = await getColl(client, collectionName, dbName);
+
+        if (!fieldValues || Object.keys(fieldValues).length === 0) {
+            return await coll.find().toArray()
+        }
+        const query = {}
+        for (const [key, value] of Object.entries(fieldValues)) {
+            query[key] = value
+        }
+        return await coll.find(query).toArray()
+    }catch (err)
+    {
+        return null
     }
 }
 
 function getResumeHtml(object){
     var html = `<!DOCTYPE html><html><body style ="background-color: dimgray;">`
     var username = ""
-    for (item of Object.keys(object)){
+    for (let item of Object.keys(object)){
         //console.log(object[item])
         if (object[item]){
             if (item == "username") {
@@ -95,4 +117,4 @@ function getResumeHtml(object){
     return html
 }
 
-module.exports = { getDB, insertRecord, getResumeHtml, fullInsert, searchByString}
+module.exports = { getColl, insertRecord, getResumeHtml, fullInsert, searchByString, searchByObj}

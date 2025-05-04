@@ -25,15 +25,20 @@
               title.innerText += job["title"];
               poster.innerText += job["poster"]
               salRange.innerText += `${job["salaryMin"]}-${job["salaryMax"]}`
-              link.href = `/viewjob?job=${job["title"]}`
+              link.href = `/viewjob?job=${job["title"]}&jid=${job["_id"]}`
               main.appendChild(newNode)
           }
-      })
+      }).catch(function (err){console.log(`ERR: ${err}`)})
   }
+
+  window.addEventListener("DOMContentLoaded", () => {
+      addHeader()
+  })
 </script>
+<script src="src.js"></script>
 <style>
     .scroll-list {
-        height: 200px;
+        height: 90%;
         overflow-y: auto;
         border: 1px solid #ccc;
     }
@@ -41,12 +46,12 @@
 <template>
     <div>
         <h1 class="title"></h1>
-        <p class="poster"></p>
-        <p class="salary"></p>
+        <p class="poster">Poster: </p>
+        <p class="salary">Salary: </p>
         <a class="link">View job</a>
     </div>
 </template>
-<body>
+<body onload="populateJobs()">
 <label>Search Job Title: <input type="text" onchange="populateJobs()" id="search"></label>
 <div id="alljobs" class="scroll-list">
 
