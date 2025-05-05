@@ -2,6 +2,7 @@
 var express = require("express")
 var app = express()
 var path = require("path")
+var crypto = require("crypto")
 
 //MONGO SETUP
 const { MongoClient, ObjectId} = require('mongodb');
@@ -245,7 +246,7 @@ app.post("/register", async (req, res) => {
     if (!username || !password || !email) {
         return res.send("Missing username or password.")
     }
-
+    var passwordHashed = crypto.createHash("sha256").update(password).digest("hex")
     try {
         const usersCol = await utils.getColl(client, "user", dbName)
         const existingUser = await usersCol.findOne({ username: username })
@@ -254,7 +255,7 @@ app.post("/register", async (req, res) => {
             return res.sendFile(path.join(rootFolder, 'exsistingusererror.html'))
         }
 
-        await usersCol.insertOne({ username: username, password: password, email:email })
+        await usersCol.insertOne({ username: username, password: passwordHashed, email:email })
         res.sendFile(path.join(rootFolder, 'registersuccess.html'))
     } catch (err) {
         console.error("Error during registration:", err)
@@ -266,9 +267,10 @@ app.post("/register", async (req, res) => {
 // Handle login
 app.post('/login', async function(req, res) {
     const { username, password } = req.body;
+    var passwordHashed = crypto.createHash("sha256").update(password).digest("hex")
     try {
         const users = await utils.getColl(client, "user", dbName);
-        const user = await users.findOne({ username: username, password: password });
+        const user = await users.findOne({ username: username, password: passwordHashed });
         if (user) {
             res.send(`
                 <script>
