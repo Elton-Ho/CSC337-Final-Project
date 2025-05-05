@@ -51,24 +51,26 @@ app.post('/sendjob', express.urlencoded({'extended':true}), function (req, res) 
     {
         res.sendFile(path.join(rootFolder, 'please-login.html'))
     }
-    var toSer = {
-        'poster': curUserName,
-        'title': q.title,
-        'salaryMin': q.salaryMin,
-        'salaryMax': q.salaryMax,
-        'reqs': q.reqs,
-        'desc': q.desc
+    else{
+        var toSer = {
+            'poster': curUserName,
+            'title': q.title,
+            'salaryMin': q.salaryMin,
+            'salaryMax': q.salaryMax,
+            'reqs': q.reqs,
+            'desc': q.desc
+        }
+        utils.fullInsert(client, "job", dbName, toSer).then(function(success){
+            if(success)
+            {
+                res.sendFile(path.join(rootFolder, 'submissionsuccess.html'))
+            }
+            else
+            {
+                res.sendFile(path.join(rootFolder, 'submissionfailure.html'))
+            }
+        } ).catch(err => res.sendFile(path.join(rootFolder, 'submissionfailure.html')))
     }
-    utils.fullInsert(client, "job", dbName, toSer).then(function(success){
-        if(success)
-        {
-            res.sendFile(path.join(rootFolder, 'submissionsuccess.html'))
-        }
-        else
-        {
-            res.sendFile(path.join(rootFolder, 'submissionfailure.html'))
-        }
-    } ).catch(err => res.sendFile(path.join(rootFolder, 'submissionfailure.html')))
 })
 
 app.get('/apply', function (req, res){

@@ -21,17 +21,17 @@
     <form method="POST" action="sendjob">
         <table>
             <tr><td><label for >Job Title: </label></td>
-                <td><input type="text" name="title" id="title"></td>
+                <td><input type="text" name="title" id="title" required></td>
             </tr>
             <tr><td><label>Salary Range: </label></td>
                 <td><input type="number" name="salaryMin"></td>
                 <td><input type="number" name="salaryMax"></td>
             </tr>    
             <tr><td><label for="reqs">Job Requirements: </label></td>
-                <td><textarea name="reqs" id="reqs"></textarea></td>
+                <td><textarea name="reqs" id="reqs" required></textarea></td>
             </tr>
             <tr><td><label for="desc">Job Description: </label></td>
-                <td><textarea name="desc" id="desc"></textarea></td>
+                <td><textarea name="desc" id="desc" required></textarea></td>
             </tr>
             <tr><td><input type="submit"></td></tr>
         </table>
