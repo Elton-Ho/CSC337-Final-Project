@@ -31,7 +31,7 @@
               title.innerText += job["title"];
               poster.innerText += job["poster"]
               salRange.innerText += `${job["salaryMin"]}-${job["salaryMax"]}`
-              link.href = `/viewjob?job=${job["title"]}&jid=${job["_id"]}`
+              link.href = `/viewjob/${job["_id"]}`
               main.appendChild(newNode)
           }
       }).catch(function (err){console.log(`ERR: ${err}`)})

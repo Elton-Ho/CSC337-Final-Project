@@ -7,5 +7,6 @@ function addHeader()
         const head =document.createElement("header");
         head.innerHTML = res;
         doc.insertBefore(head, body);
+        document.getElementById("myresume").href = `/view-resume/${window.localStorage.getItem("username")}`
     }).catch(err => console.log(err))
 }

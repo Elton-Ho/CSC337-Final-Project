@@ -19,6 +19,15 @@
 <body onload="addHeader()">
     <h1>Post a Job</h1>
     <form method="POST" action="sendjob">
+        <input type="text" id = "username" name = "username" style="visibility: hidden;">
+        <script>
+            var usernameLS = window.localStorage.getItem("username")
+
+            if (usernameLS){
+                var usernameDOM = document.getElementById("username")
+                usernameDOM.value = usernameLS
+            }
+        </script>
         <table>
             <tr><td><label for >Job Title: </label></td>
                 <td><input type="text" name="title" id="title" required></td>

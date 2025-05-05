@@ -85,7 +85,6 @@ function getResumeHtml(object){
         <body style ="background-color: dimgray;" onload = "addHeader()">`
     var username = ""
     for (let item of Object.keys(object)){
-        //console.log(object[item])
         if (object[item]){
             if (item == "username") {
                 username = object[item]
@@ -140,4 +139,119 @@ function getResumeHtml(object){
     return html
 }
 
-module.exports = { getColl, insertRecord, getResumeHtml, fullInsert, searchByString, searchByObj}
+
+function getJobHtml(jobid){
+    html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Job</title>
+    <style>
+        body{
+            background-color: dimgray;
+        }
+      </style>
+</head>
+<script>
+    function apply(){
+        var user = window.localStorage.getItem('username')
+        var jobid = "${jobid}"
+        body = {'viewJobId':jobid, 'username':user}
+        fetch("/apply", {
+                'headers': {'Content-Type': 'application/json'},
+                'method': 'POST',
+                'body': JSON.stringify(body)
+            })
+            .then(function(res){
+                return res.text()
+            })
+            .then(function(text){
+                document.open()
+                document.write(text)
+                document.close()
+            })
+            .catch(function(err){
+                console.log(err)
+            })
+    }
+    function loadJob()
+    {
+        var myPoster = ""
+        fetch("/getcurjob/${jobid}").then(res => res.json()).then(function(arr)
+        {
+            console.log(arr)
+            const job = arr[0]
+            const title = document.getElementById("title")
+            const salRange = document.getElementById("salary")
+            const poster = document.getElementById("poster")
+            const reqs = document.getElementById("reqs")
+            const desc = document.getElementById("desc")
+            title.innerText += " " +job["title"]
+            poster.innerText += " " +job["poster"]
+            salRange.innerText += " " +job["salaryMin"]+"-"+job["salaryMax"]
+            reqs.innerText += " " +job["reqs"]
+            desc.innerText += " " +job["desc"]
+            myPoster = job["poster"]
+
+            return window.localStorage.getItem("username");
+        }).then(function (user)
+        {
+            const main = document.getElementById("main")
+            if(user == myPoster)
+            {
+                return fetch("/applicants/${jobid}")
+            }
+            else
+            {
+                const newNode = document.getElementById("apply").content.cloneNode(true);
+                main.appendChild(newNode)
+                document.getElementById("apps").style.display = "none"
+                return Promise.resolve()
+            }
+        }).then(function (applicants) {
+            if (!applicants) {
+                return
+            }
+            return applicants.json()
+        }).then(function(applicants){
+            const main = document.getElementById("main")
+            for(const ind in applicants)
+            {
+                var app = applicants[ind]
+                const newNode = document.getElementById("applicant").content.cloneNode(true);
+                const username = newNode.querySelector(".username")
+                const email = newNode.querySelector(".email")
+                const link = newNode.querySelector(".link")
+                username.innerText += app["username"]
+                email.innerText += app["email"]
+                link.href = "/view-resume/"+app["username"]
+                main.appendChild(newNode)
+            }
+        }).catch(function (err){console.log(err)})
+    }
+    window.addEventListener("DOMContentLoaded", () => {
+        addHeader()
+    })
+</script>
+<script src="/src.js"></script>
+<template id="apply">
+    <a onclick="apply()" style="color: white; background-color: black;text-decoration: underline;">Apply</a>
+</template>
+<template id="applicant">
+    <p class="username">Username: </p>
+    <p class="email">Email: </p>
+    <a class="link">View Resume</a>
+</template>
+<body id="main" onload="loadJob()">
+  <h1 id="title"></h1>
+  <p id="poster">Poster:  </p>
+  <p id="salary">Salary:  </p>
+  <p id="reqs">Requirements:  </p>
+  <p id="desc">Description:  </p>
+  <h1 id="apps">Applicants:  </h1>
+</body>
+</html>`
+    return html
+}
+module.exports = { getColl, insertRecord, getResumeHtml, fullInsert, searchByString, searchByObj, getJobHtml}

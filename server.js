@@ -11,13 +11,11 @@ const client = new MongoClient(uri);
 const dbName = "cs337JobsProject"
 
 //UTILS
-const utils = require("./utils")
+const utils = require("./utils");
+const e = require("express");
 
 //GLOBALS
 var rootFolder = path.join(__dirname, 'public/')
-var curUserName = null;
-var jobToView = null;
-var viewJobId = null;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -38,22 +36,20 @@ app.get('/myjobs', function (req, res){
     res.sendFile(path.join(rootFolder, 'mypostings.html'))
 })
 
-app.get('/viewjob', function (req, res){
-    jobToView = req.query.job
-    viewJobId = req.query.jid
-    res.sendFile(path.join(rootFolder, 'viewjob.html'))
+app.get('/viewjob/:jobid', function (req, res){
+    res.send(utils.getJobHtml(req.params.jobid))
 })
 
 //FORM SUBMISSION
 app.post('/sendjob', express.urlencoded({'extended':true}), function (req, res) {
     var q = req.body
-    if(!curUserName)
+    if(!q.username)
     {
         res.sendFile(path.join(rootFolder, 'please-login.html'))
     }
     else{
         var toSer = {
-            'poster': curUserName,
+            'poster': q.username,
             'title': q.title,
             'salaryMin': q.salaryMin,
             'salaryMax': q.salaryMax,
@@ -73,14 +69,14 @@ app.post('/sendjob', express.urlencoded({'extended':true}), function (req, res) 
     }
 })
 
-app.get('/apply', function (req, res){
-    if(!curUserName || !viewJobId)
+app.post('/apply', function (req, res){
+    if(req.body.username == null || req.body.viewJobId == null)
     {
         res.sendFile(path.join(rootFolder, 'please-login.html'))
     }
     var toSer = {
-        'username':curUserName,
-        'jid':viewJobId
+        'username':req.body.username,
+        'jid':req.body.viewJobId
     }
     utils.searchByObj(client, "application", dbName, toSer).then(function (arr)
     {
@@ -108,17 +104,6 @@ app.get("/resume_form", function(req,res){
     res.sendFile(path.join(rootFolder, "resume-form.html"))
 })
 
-app.get('/myresume', (req, res, next) => {
-    if(!curUserName)
-    {
-        res.sendFile(path.join(rootFolder, 'please-login.html'))
-    }
-    req.url = `/view-resume/${curUserName}`
-    app.handle(req, res, next) // Forwards the request internally
-})
-
-
-
 //DATA REQUESTS
 app.get('/header', function (req, res){
     res.sendFile(path.join(rootFolder, 'headerContent.html'))
@@ -129,6 +114,9 @@ app.get('/src.js', function (req, res){
 })
 
 app.get("/view-resume/:username", async function(req,res){
+    if (req.params.username == "null"){
+        res.sendFile(path.join(rootFolder, 'please-login.html'))
+    }
     try{
         var db = client.db(dbName)
         var resumes = db.collection("resume")
@@ -202,12 +190,8 @@ app.post("/increaseLike", async function(req, res){
     }
 })
 
-app.get('/curuser', function (req, res){
-    res.send(curUserName)
-})
-
-app.get('/getcurjob', async function (req, res){
-    utils.searchByString(client, "job", dbName, "_id", new ObjectId(viewJobId)).then(arr => res.json(arr))
+app.get('/getcurjob/:viewJobId', async function (req, res){
+    utils.searchByString(client, "job", dbName, "_id", new ObjectId(req.params.viewJobId)).then(arr => res.json(arr))
 
 })
 
@@ -215,14 +199,14 @@ app.get('/getjobs', async function (req, res){
     utils.searchByString(client, "job", dbName, "title", req.query.search).then(arr => res.json(arr))
 })
 
-app.get('/getjobsbyposter', async function (req, res){
-    utils.searchByString(client, "job", dbName, "poster", curUserName).then(arr => res.json(arr))
+app.get('/getjobsbyposter/:username', async function (req, res){
+    utils.searchByString(client, "job", dbName, "poster", req.params.username).then(arr => res.json(arr))
 })
 
-app.get('/applicants', async function (req, res){
+app.get('/applicants/:viewJobId', async function (req, res){
     utils.getColl(client, "application", dbName).then(coll => coll.aggregate([
         {
-            $match: { jid: viewJobId }
+            $match: { jid: req.params.viewJobId }
         },
         {
             $lookup: {
@@ -286,7 +270,6 @@ app.post('/login', async function(req, res) {
         const users = await utils.getColl(client, "user", dbName);
         const user = await users.findOne({ username: username, password: password });
         if (user) {
-            curUserName = username;
             res.send(`
                 <script>
                     localStorage.setItem("username", ${JSON.stringify(username)});
@@ -303,7 +286,6 @@ app.post('/login', async function(req, res) {
 });
 //Logout
 app.get('/logout', function(req, res) {
-    curUserName = null;
     res.send(`
         <script>
             localStorage.removeItem("username");

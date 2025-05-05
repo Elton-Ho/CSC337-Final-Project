@@ -15,7 +15,7 @@
 
     const main = document.getElementById("alljobs")
 
-    const query = `getjobsbyposter`;
+    const query = `getjobsbyposter/${window.localStorage.getItem("username")}`;
     fetch(query).then(res => res.json()).then(function(arr)
     {
       for(const ind in arr)
@@ -25,7 +25,7 @@
         const title = newNode.querySelector(".title")
         const link = newNode.querySelector(".link")
         title.innerText += job["title"];
-        link.href = `/viewjob?job=${job["title"]}&jid=${job["_id"]}`
+        link.href = `/viewjob/${job["_id"]}`
         main.appendChild(newNode)
       }
     }).catch(function (err){console.log(`ERR: ${err}`)})
